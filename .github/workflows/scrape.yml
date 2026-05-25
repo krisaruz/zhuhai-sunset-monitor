@@ -1,0 +1,53 @@
+name: Daily Sunset Forecast Scraper
+
+on:
+  schedule:
+    # 04:05 UTC = 12:05 HKT (Midday check)
+    - cron: '5 4 * * *'
+    # 09:05 UTC = 17:05 HKT (Sunset prep check)
+    - cron: '5 9 * * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to push committed changes
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Runtime Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install httpx ephem pydantic-settings
+
+      - name: Run Scraper
+        env:
+          SUNSET_FEISHU_WEBHOOK_URL: ${{ secrets.SUNSET_FEISHU_WEBHOOK_URL }}
+          SUNSET_FEISHU_WEBHOOK_SECRET: ${{ secrets.SUNSET_FEISHU_WEBHOOK_SECRET }}
+          # You can also customize default city or threshold here if needed
+          SUNSET_NOTIFY_MIN_QUALITY: 0.2
+        run: python run.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add data/map-data.json data/history.json
+          # Commit only if there are changes
+          if ! git diff --cached --quiet; then
+            git commit -m "data: update sunset forecast and history [skip ci]"
+            git push origin master
+          else
+            echo "No changes in forecast or history data. Skipping commit."
+          fi
