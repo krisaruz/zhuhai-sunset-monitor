@@ -86,7 +86,12 @@ async def fetch_forecast(
             aod_value, aod_label = _parse_rated_value(data["tb_aod"])
 
             event_dt = _parse_event_date(data["display_event_date_str"])
-            img_url = f"https://sunsetbot.top{data['img_href']}"
+            img_href = data.get("img_href", "").strip()
+            if img_href.startswith("/image/"):
+                img_href = img_href.replace("/image/", "/static/media/", 1)
+            if img_href.endswith("/"):
+                img_href = img_href.rstrip("/")
+            img_url = f"https://sunsetbot.top{img_href}"
 
             return SunsetForecast(
                 city=data["display_city_name"],
