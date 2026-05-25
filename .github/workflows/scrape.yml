@@ -29,7 +29,7 @@ jobs:
       - name: Install Runtime Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install httpx ephem pydantic-settings
+          pip install httpx ephem pydantic-settings sqlalchemy aiosqlite
 
       - name: Run Scraper
         env:
