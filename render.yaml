@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: zhuhai-sunset-monitor
+    runtime: docker
+    plan: free
+    envVars:
+      - key: SUNSET_SUNSETBOT_BASE_URL
+        value: https://sunsetbot.top/
+      - key: SUNSET_SUNSETBOT_MODEL
+        value: EC
+      - key: SUNSET_DEFAULT_CITY
+        value: 珠海
+      - key: SUNSET_LATITUDE
+        value: "22.27"
+      - key: SUNSET_LONGITUDE
+        value: "113.58"
+      - key: SUNSET_DATABASE_URL
+        value: sqlite+aiosqlite:///./data/sunset.db
+      - key: SUNSET_NOTIFY_MIN_QUALITY
+        value: "0.2"
+      - key: SUNSET_AMAP_KEY
+        sync: false
+      - key: SUNSET_FEISHU_WEBHOOK_URL
+        sync: false
+      - key: SUNSET_FEISHU_WEBHOOK_SECRET
+        sync: false
+    disk:
+      name: sunset-data
+      mountPath: /app/data
+      sizeGB: 1
