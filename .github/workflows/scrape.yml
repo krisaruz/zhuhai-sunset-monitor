@@ -2,10 +2,8 @@ name: Daily Sunset Forecast Scraper
 
 on:
   schedule:
-    # 04:05 UTC = 12:05 HKT (Midday check)
-    - cron: '5 4 * * *'
-    # 09:05 UTC = 17:05 HKT (Sunset prep check)
-    - cron: '5 9 * * *'
+    # 每小时运行一次 (UTC时间每小时的第 5 分钟)
+    - cron: '5 * * * *'
   workflow_dispatch: # Allows manual trigger
 
 jobs:
