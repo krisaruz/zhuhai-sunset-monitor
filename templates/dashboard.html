@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Today's Forecast -->
+<section class="mb-8">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold text-gray-300">今日预报 · {{ today }}</h2>
+        <button onclick="location.reload()" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 rounded text-sm transition">刷新</button>
+    </div>
+
+    {% if record %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <!-- Quality Card -->
+        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+            <div class="text-sm text-gray-400 mb-1">鲜艳度</div>
+            <div class="text-3xl font-bold
+                {% if record.quality_value and record.quality_value >= 0.5 %}text-red-400
+                {% elif record.quality_value and record.quality_value >= 0.2 %}text-orange-400
+                {% elif record.quality_value and record.quality_value >= 0.05 %}text-yellow-400
+                {% else %}text-gray-400{% endif %}">
+                {{ "%.3f"|format(record.quality_value or 0) }}
+            </div>
+            <div class="text-sm mt-1
+                {% if record.quality_value and record.quality_value >= 0.5 %}text-red-400
+                {% elif record.quality_value and record.quality_value >= 0.2 %}text-orange-400
+                {% elif record.quality_value and record.quality_value >= 0.05 %}text-yellow-400
+                {% else %}text-gray-500{% endif %}">
+                {{ record.quality_label or '未知' }}
+            </div>
+        </div>
+
+        <!-- AOD Card -->
+        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+            <div class="text-sm text-gray-400 mb-1">气溶胶 AOD</div>
+            <div class="text-3xl font-bold text-blue-400">{{ "%.3f"|format(record.aod_value or 0) }}</div>
+            <div class="text-sm text-gray-500 mt-1">{{ record.aod_label or '未知' }}</div>
+        </div>
+
+        <!-- Sunset Time Card -->
+        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+            <div class="text-sm text-gray-400 mb-1">日落时间</div>
+            <div class="text-3xl font-bold text-amber-400">{{ sunset_time }}</div>
+            <div class="text-sm text-gray-500 mt-1">方位角 {{ sunset_azimuth }}°</div>
+        </div>
+
+        <!-- Model Card -->
+        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+            <div class="text-sm text-gray-400 mb-1">数据源</div>
+            <div class="text-3xl font-bold text-emerald-400">{{ record.model }}</div>
+            <div class="text-sm text-gray-500 mt-1">{{ record.fetch_time.strftime('%H:%M') }} 更新</div>
+        </div>
+    </div>
+
+    <!-- Cross-section image -->
+    {% if record.image_url %}
+    <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 mb-6">
+        <h3 class="text-sm text-gray-400 mb-3">大气截面图</h3>
+        <img src="{{ record.image_url }}" alt="大气截面图" class="w-full rounded" loading="lazy"
+             onerror="this.parentElement.style.display='none'">
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="bg-gray-800 rounded-lg p-8 border border-gray-700 text-center text-gray-500">
+        暂无今日预报数据，系统将定时自动采集
+    </div>
+    {% endif %}
+</section>
+
+<!-- Location Recommendations -->
+<section id="recommendations" class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-300 mb-4">推荐拍摄机位</h2>
+    <div id="rec-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-800 rounded-lg p-5 border border-gray-700 text-gray-500 text-center">
+            加载中...
+        </div>
+    </div>
+</section>
+
+<!-- Map Visualization -->
+<section class="mb-8">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold text-gray-300">今日日落地图 · {{ today }}</h2>
+        <button onclick="toggleLegend()" class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition">图例</button>
+    </div>
+    <div class="relative rounded-lg overflow-hidden border border-gray-700" style="height: 500px;">
+        <div id="sunset-map" class="w-full h-full"></div>
+        <!-- Legend Panel -->
+        <div id="legend-panel" class="absolute top-3 right-3 bg-gray-900/90 backdrop-blur-sm rounded-lg p-4 border border-gray-600 text-sm w-56 z-10">
+            <h3 class="text-amber-400 font-semibold mb-3">图例</h3>
+            <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-4 h-4 rounded-full bg-orange-500 border-2 border-orange-300"></span>
+                    <span>拍摄机位</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-6 h-0.5 bg-orange-400" style="border-top: 2px dashed #fb923c;"></span>
+                    <span>日落方向</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-4 h-4 bg-orange-500/30 border border-orange-500/50" style="clip-path: polygon(0 0, 100% 50%, 0 100%);"></span>
+                    <span>机位朝向范围</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-6 h-1 rounded" style="background: linear-gradient(to right, #FFD700, #FF4500);"></span>
+                    <span>太阳轨迹</span>
+                </div>
+            </div>
+            <hr class="border-gray-700 my-3">
+            <div id="legend-sunset-info" class="text-xs text-gray-400 space-y-1">
+                <div>日落时间: <span class="text-amber-400 font-medium">{{ sunset_time }}</span></div>
+                <div>方位角: <span class="text-amber-400 font-medium">{{ sunset_azimuth }}°</span></div>
+                {% if record %}
+                <div>鲜艳度: <span class="text-amber-400 font-medium">{{ "%.3f"|format(record.quality_value or 0) }}</span></div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Loading state -->
+        <div id="map-loading" class="absolute inset-0 flex items-center justify-center bg-gray-800/80 z-20">
+            <div class="text-gray-400">加载地图中...</div>
+        </div>
+    </div>
+</section>
+
+<!-- History Chart -->
+<section class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-300 mb-4">历史趋势（近30天）</h2>
+    <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <canvas id="historyChart" height="200"></canvas>
+    </div>
+</section>
+
+<!-- Burn Distribution -->
+<section class="mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <h3 class="text-sm text-gray-400 mb-3">烧等级分布</h3>
+            <canvas id="burnChart" height="200"></canvas>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <h3 class="text-sm text-gray-400 mb-3">AOD vs 鲜艳度</h3>
+            <canvas id="scatterChart" height="200"></canvas>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Legend toggle
+function toggleLegend() {
+    const panel = document.getElementById('legend-panel');
+    panel.classList.toggle('hidden');
+}
+
+// AMap initialization
+(function initMap() {
+    const amapKey = '{{ amap_key }}';
+    if (!amapKey || amapKey === 'your_amap_key_here') {
+        document.getElementById('map-loading').innerHTML =
+            '<div class="text-amber-400 text-center"><p class="mb-2">请配置高德地图 API Key</p><p class="text-xs text-gray-500">在 .env 中设置 SUNSET_AMAP_KEY</p></div>';
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://webapi.amap.com/maps?v=2.0&key=${amapKey}`;
+    script.onload = function() { renderMap(); };
+    script.onerror = function() {
+        document.getElementById('map-loading').innerHTML =
+            '<div class="text-red-400">高德地图加载失败</div>';
+    };
+    document.head.appendChild(script);
+})();
+
+function renderMap() {
+    const map = new AMap.Map('sunset-map', {
+        zoom: 12,
+        center: [113.58, 22.27],
+        mapStyle: 'amap://styles/dark',
+        viewMode: '2D',
+    });
+
+    fetch('/api/map-data')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('map-loading').style.display = 'none';
+            renderMapElements(map, data);
+        })
+        .catch(() => {
+            document.getElementById('map-loading').innerHTML =
+                '<div class="text-red-400">数据加载失败</div>';
+        });
+}
+
+function renderMapElements(map, data) {
+    const markers = [];
+
+    // 1. Sun path trajectory (render first so it's behind other elements)
+    if (data.sun_path && data.sun_path.length > 1) {
+        // Gradient segments
+        for (let i = 0; i < data.sun_path.length - 1; i++) {
+            const seg = new AMap.Polyline({
+                path: [[data.sun_path[i].lon, data.sun_path[i].lat],
+                       [data.sun_path[i+1].lon, data.sun_path[i+1].lat]],
+                strokeColor: data.sun_path[i].color,
+                strokeWeight: 4,
+                strokeOpacity: 0.9,
+            });
+            map.add(seg);
+        }
+
+        // Sun markers at key points
+        const keyIndices = [0, Math.floor(data.sun_path.length / 2), data.sun_path.length - 1];
+        keyIndices.forEach(i => {
+            if (i >= data.sun_path.length) return;
+            const p = data.sun_path[i];
+            const sunMarker = new AMap.Marker({
+                position: [p.lon, p.lat],
+                content: `<div style="background:${p.color};width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 6px ${p.color};"></div>`,
+                offset: new AMap.Pixel(-6, -6),
+                title: `${p.time} 方位${p.azimuth}°`,
+            });
+            map.add(sunMarker);
+        });
+    }
+
+    // 2. Sunset direction line
+    const sunsetAzimuth = data.sunset.azimuth;
+    const sunsetRad = (sunsetAzimuth * Math.PI) / 180;
+    const lineLenKm = 5;
+    const endLat = data.center.lat + (lineLenKm / 111) * Math.cos(sunsetRad);
+    const endLon = data.center.lon + (lineLenKm / (111 * Math.cos(data.center.lat * Math.PI / 180))) * Math.sin(sunsetRad);
+
+    const sunsetLine = new AMap.Polyline({
+        path: [[data.center.lon, data.center.lat], [endLon, endLat]],
+        strokeColor: '#fb923c',
+        strokeWeight: 3,
+        strokeStyle: 'dashed',
+        strokeOpacity: 0.9,
+        lineCap: 'round',
+    });
+    map.add(sunsetLine);
+
+    // Sunset direction label
+    const labelMarker = new AMap.Marker({
+        position: [endLon, endLat],
+        content: `<div style="background:#fb923c;color:#000;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap;">☀ ${sunsetAzimuth}° ${data.sunset.time}</div>`,
+        offset: new AMap.Pixel(-30, -12),
+    });
+    map.add(labelMarker);
+
+    // 3. Location markers and facing sectors
+    data.locations.forEach((loc, i) => {
+        // Facing sector (pie-shaped polygon)
+        const sector = createSectorPolygon(
+            loc.lat, loc.lon,
+            loc.facing_min, loc.facing_max,
+            0.4, // radius in km
+            isAligned(sunsetAzimuth, loc.facing_min, loc.facing_max)
+        );
+        map.add(sector);
+
+        // Marker with number
+        const marker = new AMap.Marker({
+            position: [loc.lon, loc.lat],
+            content: `<div style="background:#f97316;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid #fed7aa;box-shadow:0 2px 8px rgba(0,0,0,0.4);">${i + 1}</div>`,
+            offset: new AMap.Pixel(-14, -14),
+        });
+
+        // Info window
+        const infoContent = `
+            <div style="padding:8px;min-width:200px;">
+                <div style="font-size:15px;font-weight:600;margin-bottom:6px;">${loc.name}</div>
+                <div style="font-size:12px;color:#666;margin-bottom:6px;">${loc.description || ''}</div>
+                <div style="font-size:12px;margin-bottom:3px;">🧭 朝向 ${loc.facing_min}°-${loc.facing_max}°</div>
+                <div style="font-size:12px;margin-bottom:3px;">⭐ 评分 ${loc.score.toFixed(3)}</div>
+                <div style="font-size:12px;margin-bottom:3px;">💡 ${loc.reason}</div>
+                <div style="font-size:12px;margin-bottom:3px;">🕐 建议到达 ${loc.suggested_arrival}</div>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">
+                    ${loc.tags.map(t => `<span style="background:#f3f4f6;padding:1px 6px;border-radius:4px;font-size:11px;">${t}</span>`).join('')}
+                </div>
+                ${loc.map_url ? `<a href="${loc.map_url}" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:#2563eb;">导航 →</a>` : ''}
+            </div>
+        `;
+        const infoWindow = new AMap.InfoWindow({
+            content: infoContent,
+            offset: new AMap.Pixel(0, -16),
+        });
+
+        marker.on('click', () => {
+            infoWindow.open(map, marker.getPosition());
+        });
+
+        map.add(marker);
+        markers.push(marker);
+    });
+
+    // Fit view
+    if (markers.length > 0) {
+        map.setFitView(markers, false, [80, 80, 80, 80]);
+    }
+}
+
+function isAligned(sunsetAz, min, max) {
+    if (min <= max) return sunsetAz >= min && sunsetAz <= max;
+    // Wrapping case: e.g. min=350, max=10
+    return sunsetAz >= min || sunsetAz <= max;
+}
+
+function createSectorPolygon(lat, lon, azMin, azMax, radiusKm, aligned) {
+    const points = [];
+    const steps = 20;
+    const latFactor = 1 / 111;
+    const lonFactor = 1 / (111 * Math.cos(lat * Math.PI / 180));
+
+    points.push([lon, lat]);
+    for (let i = 0; i <= steps; i++) {
+        const az = azMin + (azMax - azMin) * (i / steps);
+        const rad = (az * Math.PI) / 180;
+        const pLat = lat + (radiusKm * latFactor) * Math.cos(rad);
+        const pLon = lon + (radiusKm * lonFactor) * Math.sin(rad);
+        points.push([pLon, pLat]);
+    }
+    points.push([lon, lat]);
+
+    return new AMap.Polygon({
+        path: points,
+        fillColor: aligned ? '#f97316' : '#6b7280',
+        fillOpacity: aligned ? 0.2 : 0.08,
+        strokeColor: aligned ? '#fb923c' : '#9ca3af',
+        strokeWeight: 1.5,
+        strokeOpacity: aligned ? 0.8 : 0.3,
+    });
+}
+
+// Load recommendations
+fetch('/api/locations/recommend')
+    .then(r => r.json())
+    .then(data => {
+        const container = document.getElementById('rec-cards');
+        if (!data.recommendations || data.recommendations.length === 0) {
+            container.innerHTML = '<div class="text-gray-500 text-center col-span-3">暂无推荐</div>';
+            return;
+        }
+        container.innerHTML = data.recommendations.map((r, i) => `
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700 hover:border-amber-600 transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-2xl font-bold text-amber-400">#${i+1}</span>
+                    <span class="font-semibold text-lg">${r.name}</span>
+                </div>
+                <div class="text-sm text-gray-400 mb-3">${r.description}</div>
+                <div class="space-y-1 text-sm">
+                    <div>🧭 朝向 <span class="text-amber-400">${r.facing_azimuth.toFixed(0)}°</span></div>
+                    <div>🕐 建议到达 <span class="text-amber-400">${r.suggested_arrival}</span></div>
+                    <div>💡 ${r.reason}</div>
+                </div>
+                <div class="flex gap-2 mt-3 flex-wrap">
+                    ${r.tags.map(t => `<span class="px-2 py-0.5 bg-gray-700 rounded text-xs">${t}</span>`).join('')}
+                </div>
+                ${r.map_url ? `<a href="${r.map_url}" target="_blank" class="inline-block mt-3 text-xs text-blue-400 hover:underline">导航 →</a>` : ''}
+            </div>
+        `).join('');
+    })
+    .catch(() => {
+        document.getElementById('rec-cards').innerHTML =
+            '<div class="text-gray-500 text-center col-span-3">无法加载推荐</div>';
+    });
+
+// History chart data from template
+const historyData = [
+    {% for r in history %}
+    {
+        date: "{{ r.event_date }}",
+        quality: {{ r.quality_value or 0 }},
+        aod: {{ r.aod_value or 0 }},
+        label: "{{ r.quality_label or '' }}"
+    },
+    {% endfor %}
+];
+
+if (historyData.length > 0) {
+    // Line chart: quality trend
+    const ctx1 = document.getElementById('historyChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: historyData.map(d => d.date.slice(5)),
+            datasets: [{
+                label: '鲜艳度',
+                data: historyData.map(d => d.quality),
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245,158,11,0.1)',
+                fill: true,
+                tension: 0.3,
+            }, {
+                label: 'AOD',
+                data: historyData.map(d => d.aod),
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59,130,246,0.1)',
+                fill: true,
+                tension: 0.3,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#9ca3af' } }
+            },
+            scales: {
+                x: { ticks: { color: '#6b7280' }, grid: { color: '#374151' } },
+                y: { ticks: { color: '#6b7280' }, grid: { color: '#374151' } }
+            }
+        }
+    });
+
+    // Burn distribution pie chart
+    const burnCounts = {};
+    historyData.forEach(d => {
+        const label = d.quality >= 0.5 ? '大烧' : d.quality >= 0.2 ? '中烧' :
+                      d.quality >= 0.05 ? '小烧' : d.quality >= 0.01 ? '微烧' : '不烧';
+        burnCounts[label] = (burnCounts[label] || 0) + 1;
+    });
+    const burnLabels = ['不烧', '微烧', '小烧', '中烧', '大烧'].filter(l => burnCounts[l]);
+    const burnColorMap = { '不烧': '#6b7280', '微烧': '#60a5fa', '小烧': '#fbbf24', '中烧': '#f97316', '大烧': '#ef4444' };
+
+    const ctx2 = document.getElementById('burnChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: burnLabels,
+            datasets: [{
+                data: burnLabels.map(l => burnCounts[l]),
+                backgroundColor: burnLabels.map(l => burnColorMap[l]),
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#9ca3af' } }
+            }
+        }
+    });
+
+    // Scatter: AOD vs Quality
+    const ctx3 = document.getElementById('scatterChart').getContext('2d');
+    new Chart(ctx3, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'AOD vs 鲜艳度',
+                data: historyData.map(d => ({ x: d.aod, y: d.quality })),
+                backgroundColor: '#f59e0b',
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#9ca3af' } }
+            },
+            scales: {
+                x: { title: { display: true, text: 'AOD', color: '#9ca3af' }, ticks: { color: '#6b7280' }, grid: { color: '#374151' } },
+                y: { title: { display: true, text: '鲜艳度', color: '#9ca3af' }, ticks: { color: '#6b7280' }, grid: { color: '#374151' } }
+            }
+        }
+    });
+}
+
+// Auto-refresh during pre-sunset window (16:00-20:00)
+const now = new Date();
+const hour = now.getHours();
+if (hour >= 16 && hour < 20) {
+    setTimeout(() => location.reload(), 5 * 60 * 1000);
+}
+</script>
+{% endblock %}
