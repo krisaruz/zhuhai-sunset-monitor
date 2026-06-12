@@ -37,11 +37,14 @@ jobs:
           SUNSET_NOTIFY_MIN_QUALITY: 0.2
         run: python run.py
 
+      - name: Sync data to docs for GitHub Pages
+        run: cp data/history.json data/map-data.json docs/data/
+
       - name: Commit and Push Changes
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add data/map-data.json data/history.json
+          git add data/map-data.json data/history.json docs/data/
           # Commit only if there are changes
           if ! git diff --cached --quiet; then
             git commit -m "data: update sunset forecast and history [skip ci]"

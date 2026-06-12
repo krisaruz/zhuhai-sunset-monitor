@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>珠海晚霞监控</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <style>
+        body { background: #111827; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
+        .card { background: #1f2937; border: 1px solid #374151; border-radius: 0.5rem; padding: 1.25rem; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <nav class="bg-gray-800 border-b border-gray-700 px-6 py-3">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-amber-400">珠海晚霞监控</h1>
+            <span id="update-time" class="text-xs text-gray-500"></span>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- Today's Forecast -->
+        <section>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-300" id="section-title">今日预报</h2>
+                <button onclick="location.reload()" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 rounded text-sm transition">刷新</button>
+            </div>
+            <div id="forecast-cards" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="card text-center text-gray-500 col-span-4 py-8">加载中...</div>
+            </div>
+            <div id="cross-section" class="card mb-6" style="display:none">
+                <h3 class="text-sm text-gray-400 mb-3">大气截面图</h3>
+                <img id="cross-section-img" alt="大气截面图" class="w-full rounded" loading="lazy"
+                     onerror="this.parentElement.style.display='none'">
+            </div>
+        </section>
+
+        <!-- Location Recommendations -->
+        <section>
+            <h2 class="text-lg font-semibold text-gray-300 mb-4">推荐拍摄机位</h2>
+            <div id="rec-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="card text-center text-gray-500 col-span-3">加载中...</div>
+            </div>
+        </section>
+
+        <!-- Map -->
+        <section>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-300" id="map-title">日落地图</h2>
+                <button onclick="toggleLegend()" class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition">图例</button>
+            </div>
+            <div class="relative rounded-lg overflow-hidden border border-gray-700" style="height:500px">
+                <div id="sunset-map" class="w-full h-full"></div>
+                <div id="legend-panel" class="absolute top-3 right-3 bg-gray-900/90 backdrop-blur-sm rounded-lg p-4 border border-gray-600 text-sm w-56 z-10">
+                    <h3 class="text-amber-400 font-semibold mb-3">图例</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-block w-4 h-4 rounded-full bg-orange-500 border-2 border-orange-300"></span>
+                            <span>拍摄机位</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-block w-6 h-0.5 bg-orange-400" style="border-top:2px dashed #fb923c"></span>
+                            <span>日落方向</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-block w-4 h-4 bg-orange-500/30 border border-orange-500/50" style="clip-path:polygon(0 0,100% 50%,0 100%)"></span>
+                            <span>机位朝向范围</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-block w-6 h-1 rounded" style="background:linear-gradient(to right,#FFD700,#FF4500)"></span>
+                            <span>太阳轨迹</span>
+                        </div>
+                    </div>
+                    <hr class="border-gray-700 my-3">
+                    <div id="legend-sunset-info" class="text-xs text-gray-400 space-y-1"></div>
+                </div>
+                <div id="map-loading" class="absolute inset-0 flex items-center justify-center bg-gray-800/80 z-20">
+                    <div class="text-gray-400">加载地图中...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Chart -->
+        <section>
+            <h2 class="text-lg font-semibold text-gray-300 mb-4">历史趋势</h2>
+            <div class="card">
+                <canvas id="historyChart" height="200"></canvas>
+            </div>
+        </section>
+
+        <!-- Charts Row -->
+        <section>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card">
+                    <h3 class="text-sm text-gray-400 mb-3">烧等级分布</h3>
+                    <canvas id="burnChart" height="200"></canvas>
+                </div>
+                <div class="card">
+                    <h3 class="text-sm text-gray-400 mb-3">AOD vs 鲜艳度</h3>
+                    <canvas id="scatterChart" height="200"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center text-xs text-gray-600 py-6">
+        数据来源: sunsetbot.top · 每小时自动更新
+    </footer>
+
+    <script>
+    const AMAP_KEY = '6882821966cec599f9567fd24e141c83';
+
+    // Fetch data
+    async function loadData() {
+        const [historyRes, mapRes] = await Promise.all([
+            fetch('data/history.json'),
+            fetch('data/map-data.json'),
+        ]);
+        const history = await historyRes.json();
+        const mapData = await mapRes.json();
+        return { history, mapData };
+    }
+
+    function qualityColor(v) {
+        if (v >= 0.5) return 'text-red-400';
+        if (v >= 0.2) return 'text-orange-400';
+        if (v >= 0.05) return 'text-yellow-400';
+        return 'text-gray-400';
+    }
+
+    function qualityBg(v) {
+        if (v >= 0.5) return 'bg-red-400';
+        if (v >= 0.2) return 'bg-orange-400';
+        if (v >= 0.05) return 'bg-yellow-400';
+        return 'bg-gray-400';
+    }
+
+    function renderForecast(record) {
+        const container = document.getElementById('forecast-cards');
+        if (!record) {
+            container.innerHTML = '<div class="card text-center text-gray-500 col-span-4 py-8">暂无预报数据</div>';
+            return;
+        }
+        const qc = qualityColor(record.quality_value);
+        container.innerHTML = `
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-1">鲜艳度</div>
+                <div class="text-3xl font-bold ${qc}">${(record.quality_value || 0).toFixed(3)}</div>
+                <div class="text-sm mt-1 ${qc}">${record.quality_label || '未知'}</div>
+            </div>
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-1">气溶胶 AOD</div>
+                <div class="text-3xl font-bold text-blue-400">${(record.aod_value || 0).toFixed(3)}</div>
+                <div class="text-sm text-gray-500 mt-1">${record.aod_label || '未知'}</div>
+            </div>
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-1">日落时间</div>
+                <div class="text-3xl font-bold text-amber-400">${record.event_time || '--:--'}</div>
+                <div class="text-sm text-gray-500 mt-1">方位角 ${record.sunset_azimuth || 0}°</div>
+            </div>
+            <div class="card">
+                <div class="text-sm text-gray-400 mb-1">数据源</div>
+                <div class="text-3xl font-bold text-emerald-400">${record.model || 'EC'}</div>
+                <div class="text-sm text-gray-500 mt-1">${record.fetch_time ? new Date(record.fetch_time).toLocaleString('zh-CN') : ''} 更新</div>
+            </div>
+        `;
+
+        // Cross-section image
+        if (record.image_url) {
+            document.getElementById('cross-section-img').src = record.image_url;
+            document.getElementById('cross-section').style.display = '';
+        }
+
+        // Update title
+        document.getElementById('section-title').textContent = `预报 · ${record.event_date}`;
+    }
+
+    function renderRecommendations(mapData) {
+        const container = document.getElementById('rec-cards');
+        if (!mapData.locations || mapData.locations.length === 0) {
+            container.innerHTML = '<div class="card text-center text-gray-500 col-span-3">暂无推荐</div>';
+            return;
+        }
+        container.innerHTML = mapData.locations.map((loc, i) => `
+            <div class="card hover:border-amber-600 transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-2xl font-bold text-amber-400">#${i+1}</span>
+                    <span class="font-semibold text-lg">${loc.name}</span>
+                </div>
+                <div class="text-sm text-gray-400 mb-3">${loc.description || ''}</div>
+                <div class="space-y-1 text-sm">
+                    <div>🧭 朝向 <span class="text-amber-400">${loc.facing_min}°-${loc.facing_max}°</span></div>
+                    <div>🕐 建议到达 <span class="text-amber-400">${loc.suggested_arrival || '--'}</span></div>
+                    <div>💡 ${loc.reason || ''}</div>
+                </div>
+                <div class="flex gap-2 mt-3 flex-wrap">
+                    ${(loc.tags || []).map(t => `<span class="px-2 py-0.5 bg-gray-700 rounded text-xs">${t}</span>`).join('')}
+                </div>
+                ${loc.map_url ? `<a href="${loc.map_url}" target="_blank" class="inline-block mt-3 text-xs text-blue-400 hover:underline">导航 →</a>` : ''}
+            </div>
+        `).join('');
+    }
+
+    // Map
+    function toggleLegend() {
+        document.getElementById('legend-panel').classList.toggle('hidden');
+    }
+
+    function isAligned(sunsetAz, min, max) {
+        if (min <= max) return sunsetAz >= min && sunsetAz <= max;
+        return sunsetAz >= min || sunsetAz <= max;
+    }
+
+    function createSectorPolygon(lat, lon, azMin, azMax, radiusKm, aligned) {
+        const points = [];
+        const steps = 20;
+        const latFactor = 1 / 111;
+        const lonFactor = 1 / (111 * Math.cos(lat * Math.PI / 180));
+        points.push([lon, lat]);
+        for (let i = 0; i <= steps; i++) {
+            const az = azMin + (azMax - azMin) * (i / steps);
+            const rad = (az * Math.PI) / 180;
+            points.push([lon + (radiusKm * lonFactor) * Math.sin(rad), lat + (radiusKm * latFactor) * Math.cos(rad)]);
+        }
+        points.push([lon, lat]);
+        return new AMap.Polygon({
+            path: points,
+            fillColor: aligned ? '#f97316' : '#6b7280',
+            fillOpacity: aligned ? 0.2 : 0.08,
+            strokeColor: aligned ? '#fb923c' : '#9ca3af',
+            strokeWeight: 1.5,
+            strokeOpacity: aligned ? 0.8 : 0.3,
+        });
+    }
+
+    function renderMap(mapData) {
+        const map = new AMap.Map('sunset-map', {
+            zoom: 12,
+            center: [mapData.center.lon, mapData.center.lat],
+            mapStyle: 'amap://styles/dark',
+            viewMode: '2D',
+        });
+
+        const markers = [];
+
+        // Sun path
+        if (mapData.sun_path && mapData.sun_path.length > 1) {
+            for (let i = 0; i < mapData.sun_path.length - 1; i++) {
+                const seg = new AMap.Polyline({
+                    path: [[mapData.sun_path[i].lon, mapData.sun_path[i].lat],
+                           [mapData.sun_path[i+1].lon, mapData.sun_path[i+1].lat]],
+                    strokeColor: mapData.sun_path[i].color,
+                    strokeWeight: 4,
+                    strokeOpacity: 0.9,
+                });
+                map.add(seg);
+            }
+            [0, Math.floor(mapData.sun_path.length / 2), mapData.sun_path.length - 1].forEach(i => {
+                if (i >= mapData.sun_path.length) return;
+                const p = mapData.sun_path[i];
+                const m = new AMap.Marker({
+                    position: [p.lon, p.lat],
+                    content: `<div style="background:${p.color};width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 6px ${p.color}"></div>`,
+                    offset: new AMap.Pixel(-6, -6),
+                    title: `${p.time} 方位${p.azimuth}°`,
+                });
+                map.add(m);
+            });
+        }
+
+        // Sunset direction line
+        const sunsetAz = mapData.sunset.azimuth;
+        const sunsetRad = (sunsetAz * Math.PI) / 180;
+        const lineLenKm = 5;
+        const endLat = mapData.center.lat + (lineLenKm / 111) * Math.cos(sunsetRad);
+        const endLon = mapData.center.lon + (lineLenKm / (111 * Math.cos(mapData.center.lat * Math.PI / 180))) * Math.sin(sunsetRad);
+        map.add(new AMap.Polyline({
+            path: [[mapData.center.lon, mapData.center.lat], [endLon, endLat]],
+            strokeColor: '#fb923c', strokeWeight: 3, strokeStyle: 'dashed', strokeOpacity: 0.9, lineCap: 'round',
+        }));
+        map.add(new AMap.Marker({
+            position: [endLon, endLat],
+            content: `<div style="background:#fb923c;color:#000;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap">☀ ${sunsetAz}° ${mapData.sunset.time}</div>`,
+            offset: new AMap.Pixel(-30, -12),
+        }));
+
+        // Locations
+        mapData.locations.forEach((loc, i) => {
+            map.add(createSectorPolygon(loc.lat, loc.lon, loc.facing_min, loc.facing_max, 0.4, isAligned(sunsetAz, loc.facing_min, loc.facing_max)));
+            const marker = new AMap.Marker({
+                position: [loc.lon, loc.lat],
+                content: `<div style="background:#f97316;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid #fed7aa;box-shadow:0 2px 8px rgba(0,0,0,0.4)">${i + 1}</div>`,
+                offset: new AMap.Pixel(-14, -14),
+            });
+            const info = new AMap.InfoWindow({
+                content: `<div style="padding:8px;min-width:200px">
+                    <div style="font-size:15px;font-weight:600;margin-bottom:6px">${loc.name}</div>
+                    <div style="font-size:12px;color:#666;margin-bottom:6px">${loc.description || ''}</div>
+                    <div style="font-size:12px;margin-bottom:3px">🧭 朝向 ${loc.facing_min}°-${loc.facing_max}°</div>
+                    <div style="font-size:12px;margin-bottom:3px">⭐ 评分 ${(loc.score || 0).toFixed(3)}</div>
+                    <div style="font-size:12px;margin-bottom:3px">💡 ${loc.reason || ''}</div>
+                    <div style="font-size:12px;margin-bottom:3px">🕐 建议到达 ${loc.suggested_arrival || '--'}</div>
+                    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${(loc.tags || []).map(t => `<span style="background:#f3f4f6;padding:1px 6px;border-radius:4px;font-size:11px">${t}</span>`).join('')}</div>
+                    ${loc.map_url ? `<a href="${loc.map_url}" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;color:#2563eb">导航 →</a>` : ''}
+                </div>`,
+                offset: new AMap.Pixel(0, -16),
+            });
+            marker.on('click', () => info.open(map, marker.getPosition()));
+            map.add(marker);
+            markers.push(marker);
+        });
+
+        if (markers.length > 0) map.setFitView(markers, false, [80, 80, 80, 80]);
+        document.getElementById('map-loading').style.display = 'none';
+
+        // Legend info
+        document.getElementById('legend-sunset-info').innerHTML = `
+            <div>日落时间: <span class="text-amber-400 font-medium">${mapData.sunset.time}</span></div>
+            <div>方位角: <span class="text-amber-400 font-medium">${mapData.sunset.azimuth}°</span></div>
+            <div>鲜艳度: <span class="text-amber-400 font-medium">${(mapData.sunset.quality_value || 0).toFixed(3)}</span></div>
+        `;
+        document.getElementById('map-title').textContent = `日落地图 · ${mapData.date}`;
+    }
+
+    function renderCharts(history) {
+        if (!history || history.length === 0) return;
+
+        // Sort by date ascending
+        const sorted = [...history].sort((a, b) => a.event_date.localeCompare(b.event_date));
+
+        // History line chart
+        const ctx1 = document.getElementById('historyChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: sorted.map(d => d.event_date.slice(5)),
+                datasets: [{
+                    label: '鲜艳度',
+                    data: sorted.map(d => d.quality_value || 0),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245,158,11,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                }, {
+                    label: 'AOD',
+                    data: sorted.map(d => d.aod_value || 0),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { labels: { color: '#9ca3af' } } },
+                scales: {
+                    x: { ticks: { color: '#6b7280' }, grid: { color: '#374151' } },
+                    y: { ticks: { color: '#6b7280' }, grid: { color: '#374151' } },
+                },
+            },
+        });
+
+        // Burn distribution
+        const burnCounts = {};
+        sorted.forEach(d => {
+            const v = d.quality_value || 0;
+            const label = v >= 0.5 ? '大烧' : v >= 0.2 ? '中烧' : v >= 0.05 ? '小烧' : v >= 0.01 ? '微烧' : '不烧';
+            burnCounts[label] = (burnCounts[label] || 0) + 1;
+        });
+        const burnLabels = ['不烧', '微烧', '小烧', '中烧', '大烧'].filter(l => burnCounts[l]);
+        const burnColors = { '不烧': '#6b7280', '微烧': '#60a5fa', '小烧': '#fbbf24', '中烧': '#f97316', '大烧': '#ef4444' };
+        new Chart(document.getElementById('burnChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: burnLabels,
+                datasets: [{ data: burnLabels.map(l => burnCounts[l]), backgroundColor: burnLabels.map(l => burnColors[l]) }],
+            },
+            options: { responsive: true, plugins: { legend: { labels: { color: '#9ca3af' } } } },
+        });
+
+        // Scatter: AOD vs Quality
+        new Chart(document.getElementById('scatterChart').getContext('2d'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'AOD vs 鲜艳度',
+                    data: sorted.map(d => ({ x: d.aod_value || 0, y: d.quality_value || 0 })),
+                    backgroundColor: '#f59e0b',
+                }],
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { labels: { color: '#9ca3af' } } },
+                scales: {
+                    x: { title: { display: true, text: 'AOD', color: '#9ca3af' }, ticks: { color: '#6b7280' }, grid: { color: '#374151' } },
+                    y: { title: { display: true, text: '鲜艳度', color: '#9ca3af' }, ticks: { color: '#6b7280' }, grid: { color: '#374151' } },
+                },
+            },
+        });
+    }
+
+    // Init
+    (async function main() {
+        try {
+            const { history, mapData } = await loadData();
+
+            // Find best record for display (latest set_1 or set_2)
+            const latestRecord = history.find(r => r.event_type === 'set_1' || r.event_type === 'set_2');
+
+            renderForecast(latestRecord);
+            renderRecommendations(mapData);
+            renderCharts(history);
+
+            // Load AMap
+            const script = document.createElement('script');
+            script.src = `https://webapi.amap.com/maps?v=2.0&key=${AMAP_KEY}`;
+            script.onload = () => renderMap(mapData);
+            script.onerror = () => {
+                document.getElementById('map-loading').innerHTML = '<div class="text-red-400">高德地图加载失败</div>';
+            };
+            document.head.appendChild(script);
+
+            // Update time
+            const fetchTime = latestRecord?.fetch_time;
+            if (fetchTime) {
+                document.getElementById('update-time').textContent = `数据更新: ${new Date(fetchTime).toLocaleString('zh-CN')}`;
+            }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('forecast-cards').innerHTML =
+                '<div class="card text-center text-red-400 col-span-4 py-8">数据加载失败，请稍后刷新</div>';
+        }
+    })();
+    </script>
+</body>
+</html>
