@@ -6,11 +6,21 @@ on:
     - cron: '5 * * * *'
   workflow_dispatch: # Allows manual trigger
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   scrape:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # Required to push committed changes
 
     steps:
       - name: Checkout Repository
@@ -52,3 +62,15 @@ jobs:
           else
             echo "No changes in forecast or history data. Skipping commit."
           fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
