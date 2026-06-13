@@ -47,7 +47,7 @@ jobs:
           git add data/map-data.json data/history.json docs/data/
           # Commit only if there are changes
           if ! git diff --cached --quiet; then
-            git commit -m "data: update sunset forecast and history [skip ci]"
+            git commit -m "data: update sunset forecast and history"
             git push origin master
           else
             echo "No changes in forecast or history data. Skipping commit."
