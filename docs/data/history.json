@@ -25,12 +25,12 @@
     "quality_value": 0.0,
     "quality_label": "不烧",
     "quality_raw": "0.0（不烧）",
-    "aod_value": 0.203,
+    "aod_value": 0.232,
     "aod_label": "还不错",
-    "aod_raw": "0.203（还不错）",
-    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260619_set_2026061712z.jpg",
+    "aod_raw": "0.232（还不错）",
+    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260619_set_2026061812z.jpg",
     "sunset_azimuth": 295.6,
-    "fetch_time": "2026-06-19T06:57:44.181710+08:00",
+    "fetch_time": "2026-06-19T09:46:11.552387+08:00",
     "notified": false
   },
   {
