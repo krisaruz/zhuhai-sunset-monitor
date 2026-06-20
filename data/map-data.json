@@ -7,11 +7,11 @@
   "sunset": {
     "azimuth": 295.6,
     "time": "19:09",
-    "quality_value": 0.004,
-    "quality_label": "微烧",
-    "aod_value": 0.2,
+    "quality_value": 0.0,
+    "quality_label": "不烧",
+    "aod_value": 0.149,
     "aod_label": "水晶",
-    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260620_set_2026061812z.jpg"
+    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260620_set_2026061912z.jpg"
   },
   "locations": [
     {
