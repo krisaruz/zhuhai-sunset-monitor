@@ -8,12 +8,12 @@
     "quality_value": 0.0,
     "quality_label": "不烧",
     "quality_raw": "0.0（不烧）",
-    "aod_value": 0.174,
+    "aod_value": 0.184,
     "aod_label": "水晶",
-    "aod_raw": "0.174（水晶）",
-    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260706_set_2026070412z.jpg",
+    "aod_raw": "0.184（水晶）",
+    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260706_set_2026070500z.jpg",
     "sunset_azimuth": 294.7,
-    "fetch_time": "2026-07-05T20:19:18.934230+08:00",
+    "fetch_time": "2026-07-05T22:46:57.198853+08:00",
     "notified": false
   },
   {
@@ -47,7 +47,7 @@
     "aod_raw": "0.232（还不错）",
     "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260705_set_2026070412z.jpg",
     "sunset_azimuth": 294.8,
-    "fetch_time": "2026-07-05T20:19:17.648418+08:00",
+    "fetch_time": "2026-07-05T22:46:56.479163+08:00",
     "notified": false
   },
   {
