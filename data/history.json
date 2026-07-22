@@ -18,6 +18,23 @@
   },
   {
     "city": "珠海",
+    "event_date": "2026-07-23",
+    "event_time": "19:07",
+    "event_type": "set_1",
+    "model": "EC",
+    "quality_value": 0.0,
+    "quality_label": "不烧",
+    "quality_raw": "0.0（不烧）",
+    "aod_value": 0.199,
+    "aod_label": "水晶",
+    "aod_raw": "0.199（水晶）",
+    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260723_set_2026072112z.jpg",
+    "sunset_azimuth": 291.8,
+    "fetch_time": "2026-07-23T01:24:05.666187+08:00",
+    "notified": false
+  },
+  {
+    "city": "珠海",
     "event_date": "2026-07-22",
     "event_time": "19:08",
     "event_type": "set_2",
