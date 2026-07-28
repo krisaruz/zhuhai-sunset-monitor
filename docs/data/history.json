@@ -1,6 +1,23 @@
 [
   {
     "city": "珠海",
+    "event_date": "2026-07-29",
+    "event_time": "19:05",
+    "event_type": "set_2",
+    "model": "EC",
+    "quality_value": 0.146,
+    "quality_label": "小烧",
+    "quality_raw": "0.146（小烧）",
+    "aod_value": 0.152,
+    "aod_label": "水晶",
+    "aod_raw": "0.152（水晶）",
+    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260729_set_2026072712z.jpg",
+    "sunset_azimuth": 290.4,
+    "fetch_time": "2026-07-28T12:13:21.511888+08:00",
+    "notified": false
+  },
+  {
+    "city": "珠海",
     "event_date": "2026-07-28",
     "event_time": "19:05",
     "event_type": "set_2",
@@ -22,15 +39,15 @@
     "event_time": "19:05",
     "event_type": "set_1",
     "model": "EC",
-    "quality_value": 0.136,
+    "quality_value": 0.122,
     "quality_label": "小烧",
-    "quality_raw": "0.136（小烧）",
-    "aod_value": 0.19,
-    "aod_label": "水晶",
-    "aod_raw": "0.19（水晶）",
-    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260728_set_2026072612z.jpg",
+    "quality_raw": "0.122（小烧）",
+    "aod_value": 0.213,
+    "aod_label": "还不错",
+    "aod_raw": "0.213（还不错）",
+    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260728_set_2026072712z.jpg",
     "sunset_azimuth": 290.6,
-    "fetch_time": "2026-07-28T08:05:21.374718+08:00",
+    "fetch_time": "2026-07-28T12:13:20.452279+08:00",
     "notified": false
   },
   {
@@ -1680,23 +1697,6 @@
     "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260606_set_2026060412z.jpg",
     "sunset_azimuth": 294.7,
     "fetch_time": "2026-06-05T23:58:43.113576+08:00",
-    "notified": false
-  },
-  {
-    "city": "珠海",
-    "event_date": "2026-06-06",
-    "event_time": "19:05",
-    "event_type": "set_1",
-    "model": "EC",
-    "quality_value": 0.091,
-    "quality_label": "小烧",
-    "quality_raw": "0.091（小烧）",
-    "aod_value": 0.237,
-    "aod_label": "还不错",
-    "aod_raw": "0.237（还不错）",
-    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260606_set_2026060512z.jpg",
-    "sunset_azimuth": 294.7,
-    "fetch_time": "2026-06-06T23:19:54.595981+08:00",
     "notified": false
   }
 ]
