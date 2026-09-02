@@ -1,6 +1,23 @@
 [
   {
     "city": "珠海",
+    "event_date": "2026-09-02",
+    "event_time": "18:39",
+    "event_type": "set_1",
+    "model": "EC",
+    "quality_value": 0.321,
+    "quality_label": "小烧到中烧",
+    "quality_raw": "0.321（小烧到中烧）",
+    "aod_value": 0.262,
+    "aod_label": "还不错",
+    "aod_raw": "0.262（还不错）",
+    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260902_set_2026090112z.jpg",
+    "sunset_azimuth": 278.6,
+    "fetch_time": "2026-09-02T11:45:24.033016+08:00",
+    "notified": false
+  },
+  {
+    "city": "珠海",
     "event_date": "2026-09-01",
     "event_time": "18:40",
     "event_type": "set_1",
@@ -1680,23 +1697,6 @@
     "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260701_set_2026063012z.jpg",
     "sunset_azimuth": 295.2,
     "fetch_time": "2026-07-01T23:45:46.179196+08:00",
-    "notified": false
-  },
-  {
-    "city": "珠海",
-    "event_date": "2026-06-30",
-    "event_time": "19:10",
-    "event_type": "set_1",
-    "model": "EC",
-    "quality_value": 0.0,
-    "quality_label": "不烧",
-    "quality_raw": "0.0（不烧）",
-    "aod_value": 0.19,
-    "aod_label": "水晶",
-    "aod_raw": "0.19（水晶）",
-    "image_url": "https://sunsetbot.top/static/media/cross_section/EC_珠海_20260630_set_2026062912z.jpg",
-    "sunset_azimuth": 295.3,
-    "fetch_time": "2026-06-30T23:32:15.526664+08:00",
     "notified": false
   }
 ]
