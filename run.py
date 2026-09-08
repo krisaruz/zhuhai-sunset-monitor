@@ -188,7 +188,7 @@ async def main():
     # 5. Clean up & sort history
     # Sort by event_date descending, then event_type descending (set_2 before set_1 for same date if any, but date is unique generally)
     history.sort(key=lambda r: (r.get("event_date", ""), r.get("event_type", "")), reverse=True)
-    history = history[:100]  # limit to 100 entries
+    history = history[:1000]  # limit to 1000 entries (~600 monitored days, set_1/set_2 both kept)
     
     # Save history.json
     with open(history_file, "w", encoding="utf-8") as f:
