@@ -13,7 +13,7 @@ logger = logging.getLogger("sunset-runner")
 
 # Import project modules
 from src.config import settings
-from src.services.sunsetbot import fetch_forecast
+from src.services.open_meteo import fetch_forecast
 from src.services.astronomer import compute_sunset_azimuth, compute_sun_path
 from src.services.location_recommender import recommend_locations
 from src.services.notifier import send_feishu_notification
@@ -25,7 +25,7 @@ async def process_forecast(event_type: str, target_date: date) -> dict | None:
     """Fetch forecast for event_type, compute metadata, and return record dict."""
     logger.info(f"Processing forecast for event={event_type}, date={target_date}...")
     
-    forecast = await fetch_forecast(event=event_type, model=settings.sunsetbot_model)
+    forecast = await fetch_forecast(event=event_type)
     if not forecast:
         logger.warning(f"No forecast found for event {event_type}")
         return None
@@ -43,7 +43,7 @@ async def process_forecast(event_type: str, target_date: date) -> dict | None:
         "event_date": str(event_date),
         "event_time": sunset_time.strftime("%H:%M"),
         "event_type": event_type,
-        "model": settings.sunsetbot_model,
+        "model": forecast.model,
         "quality_value": forecast.quality_value,
         "quality_label": forecast.quality_label,
         "quality_raw": forecast.quality_raw,
