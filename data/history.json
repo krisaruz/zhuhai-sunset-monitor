@@ -8,12 +8,12 @@
     "quality_value": 0.012,
     "quality_label": "微烧",
     "quality_raw": "0.012（微烧）",
-    "aod_value": 0.473,
+    "aod_value": 0.507,
     "aod_label": "小污",
-    "aod_raw": "0.473（小污）",
+    "aod_raw": "0.507（小污）",
     "image_url": "",
     "sunset_azimuth": 271.6,
-    "fetch_time": "2026-09-18T15:13:28.956210+08:00",
+    "fetch_time": "2026-09-18T20:48:59.020572+08:00",
     "notified": false
   },
   {
@@ -42,12 +42,12 @@
     "quality_value": 0.0,
     "quality_label": "不烧",
     "quality_raw": "0.000（不烧）",
-    "aod_value": 0.4,
+    "aod_value": 0.32,
     "aod_label": "一般",
-    "aod_raw": "0.400（一般）",
+    "aod_raw": "0.320（一般）",
     "image_url": "",
     "sunset_azimuth": 272.0,
-    "fetch_time": "2026-09-18T15:13:28.008416+08:00",
+    "fetch_time": "2026-09-18T20:48:57.751303+08:00",
     "notified": false
   },
   {
