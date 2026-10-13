@@ -7,9 +7,9 @@
   "sunset": {
     "azimuth": 261.6,
     "time": "18:00",
-    "quality_value": 0.01,
+    "quality_value": 0.017,
     "quality_label": "微烧",
-    "aod_value": 0.753,
+    "aod_value": 0.793,
     "aod_label": "大污",
     "image_url": ""
   },
