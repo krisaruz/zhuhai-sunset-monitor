@@ -3,14 +3,14 @@
     "lat": 22.27,
     "lon": 113.58
   },
-  "date": "2026-10-17",
+  "date": "2026-10-18",
   "sunset": {
-    "azimuth": 260.0,
-    "time": "17:56",
-    "quality_value": 0.059,
+    "azimuth": 259.6,
+    "time": "17:55",
+    "quality_value": 0.066,
     "quality_label": "小烧",
-    "aod_value": 0.23,
-    "aod_label": "还不错",
+    "aod_value": 0.17,
+    "aod_label": "水晶",
     "image_url": ""
   },
   "locations": [
@@ -28,7 +28,7 @@
         "日落步道"
       ],
       "description": "珠海最著名的海滨步道，沿海岸线延伸，视野开阔无遮挡",
-      "suggested_arrival": "17:26",
+      "suggested_arrival": "17:25",
       "map_url": "https://uri.amap.com/marker?position=113.5720,22.2475&name=情侣路"
     },
     {
@@ -45,7 +45,7 @@
         "海边"
       ],
       "description": "珠海地标，石雕渔女矗立海中，日落时可拍摄经典剪影",
-      "suggested_arrival": "17:26",
+      "suggested_arrival": "17:25",
       "map_url": "https://uri.amap.com/marker?position=113.5765,22.2530&name=珠海渔女"
     },
     {
@@ -62,200 +62,200 @@
         "海边"
       ],
       "description": "珠海大剧院，贝壳造型独特建筑，日落前景极佳",
-      "suggested_arrival": "17:26",
+      "suggested_arrival": "17:25",
       "map_url": "https://uri.amap.com/marker?position=113.5650,22.2380&name=日月贝歌剧院"
     }
   ],
   "sun_path": [
     {
-      "lat": 22.265405,
-      "lon": 113.60878,
-      "azimuth": 99.8,
+      "lat": 22.265221,
+      "lon": 113.608745,
+      "azimuth": 100.2,
       "altitude": -0.3,
       "time": "06:25",
       "color": "#ffd700"
     },
     {
-      "lat": 22.264051,
-      "lon": 113.608489,
-      "azimuth": 102.7,
+      "lat": 22.263868,
+      "lon": 113.608444,
+      "azimuth": 103.1,
       "altitude": 6.5,
       "time": "06:55",
       "color": "#ffd000"
     },
     {
-      "lat": 22.26261,
-      "lon": 113.608093,
-      "azimuth": 105.9,
-      "altitude": 13.3,
+      "lat": 22.262426,
+      "lon": 113.608035,
+      "azimuth": 106.3,
+      "altitude": 13.2,
       "time": "07:25",
       "color": "#ffca00"
     },
     {
-      "lat": 22.261046,
-      "lon": 113.607556,
-      "azimuth": 109.3,
-      "altitude": 19.9,
+      "lat": 22.26086,
+      "lon": 113.607485,
+      "azimuth": 109.8,
+      "altitude": 19.8,
       "time": "07:55",
       "color": "#ffc400"
     },
     {
-      "lat": 22.259319,
-      "lon": 113.606828,
-      "azimuth": 113.3,
+      "lat": 22.25913,
+      "lon": 113.606739,
+      "azimuth": 113.7,
       "altitude": 26.3,
       "time": "08:25",
       "color": "#ffbd00"
     },
     {
-      "lat": 22.257384,
-      "lon": 113.605828,
-      "azimuth": 117.8,
-      "altitude": 32.6,
+      "lat": 22.257193,
+      "lon": 113.605718,
+      "azimuth": 118.3,
+      "altitude": 32.5,
       "time": "08:55",
       "color": "#ffb700"
     },
     {
-      "lat": 22.255199,
-      "lon": 113.604437,
-      "azimuth": 123.2,
-      "altitude": 38.6,
+      "lat": 22.255008,
+      "lon": 113.6043,
+      "azimuth": 123.7,
+      "altitude": 38.5,
       "time": "09:25",
       "color": "#ffb100"
     },
     {
-      "lat": 22.252737,
-      "lon": 113.602472,
-      "azimuth": 129.7,
-      "altitude": 44.2,
+      "lat": 22.252552,
+      "lon": 113.602304,
+      "azimuth": 130.2,
+      "altitude": 44.0,
       "time": "09:55",
       "color": "#ffaa00"
     },
     {
-      "lat": 22.250029,
-      "lon": 113.599679,
-      "azimuth": 137.6,
-      "altitude": 49.2,
+      "lat": 22.249862,
+      "lon": 113.599478,
+      "azimuth": 138.2,
+      "altitude": 49.0,
       "time": "10:25",
       "color": "#ffa400"
     },
     {
-      "lat": 22.247237,
-      "lon": 113.595744,
-      "azimuth": 147.4,
-      "altitude": 53.4,
+      "lat": 22.247104,
+      "lon": 113.595518,
+      "azimuth": 147.9,
+      "altitude": 53.2,
       "time": "10:55",
       "color": "#ff9e00"
     },
     {
-      "lat": 22.244752,
-      "lon": 113.590422,
-      "azimuth": 159.1,
-      "altitude": 56.5,
+      "lat": 22.244673,
+      "lon": 113.590195,
+      "azimuth": 159.6,
+      "altitude": 56.2,
       "time": "11:25",
       "color": "#ff9700"
     },
     {
-      "lat": 22.243205,
-      "lon": 113.583817,
-      "azimuth": 172.5,
-      "altitude": 58.2,
+      "lat": 22.243183,
+      "lon": 113.583632,
+      "azimuth": 172.9,
+      "altitude": 57.9,
       "time": "11:55",
       "color": "#ff9100"
     },
     {
-      "lat": 22.243152,
-      "lon": 113.576646,
-      "azimuth": 186.6,
-      "altitude": 58.3,
+      "lat": 22.243163,
+      "lon": 113.57654,
+      "azimuth": 186.8,
+      "altitude": 57.9,
       "time": "12:25",
       "color": "#ff8b00"
     },
     {
-      "lat": 22.244613,
-      "lon": 113.569981,
+      "lat": 22.244621,
+      "lon": 113.569959,
       "azimuth": 200.1,
-      "altitude": 56.7,
+      "altitude": 56.3,
       "time": "12:55",
       "color": "#ff8500"
     },
     {
-      "lat": 22.247051,
-      "lon": 113.564573,
-      "azimuth": 211.9,
-      "altitude": 53.6,
+      "lat": 22.247031,
+      "lon": 113.564609,
+      "azimuth": 211.8,
+      "altitude": 53.2,
       "time": "13:25",
       "color": "#ff7e00"
     },
     {
-      "lat": 22.249831,
-      "lon": 113.560559,
-      "azimuth": 221.7,
-      "altitude": 49.4,
+      "lat": 22.249778,
+      "lon": 113.560623,
+      "azimuth": 221.6,
+      "altitude": 49.1,
       "time": "13:55",
       "color": "#ff7800"
     },
     {
-      "lat": 22.252543,
-      "lon": 113.557704,
-      "azimuth": 229.8,
-      "altitude": 44.5,
+      "lat": 22.252465,
+      "lon": 113.557776,
+      "azimuth": 229.5,
+      "altitude": 44.1,
       "time": "14:25",
       "color": "#ff7200"
     },
     {
-      "lat": 22.255014,
-      "lon": 113.555695,
-      "azimuth": 236.3,
-      "altitude": 38.9,
+      "lat": 22.254918,
+      "lon": 113.555764,
+      "azimuth": 236.1,
+      "altitude": 38.6,
       "time": "14:55",
       "color": "#ff6b00"
     },
     {
-      "lat": 22.257209,
-      "lon": 113.554272,
-      "azimuth": 241.8,
-      "altitude": 32.9,
+      "lat": 22.257103,
+      "lon": 113.554334,
+      "azimuth": 241.5,
+      "altitude": 32.6,
       "time": "15:25",
       "color": "#ff6500"
     },
     {
-      "lat": 22.259152,
-      "lon": 113.55325,
-      "azimuth": 246.3,
-      "altitude": 26.7,
+      "lat": 22.259038,
+      "lon": 113.553304,
+      "azimuth": 246.1,
+      "altitude": 26.4,
       "time": "15:55",
       "color": "#ff5f00"
     },
     {
-      "lat": 22.260885,
-      "lon": 113.552506,
-      "azimuth": 250.3,
-      "altitude": 20.2,
+      "lat": 22.260766,
+      "lon": 113.552552,
+      "azimuth": 250.0,
+      "altitude": 19.9,
       "time": "16:25",
       "color": "#ff5800"
     },
     {
-      "lat": 22.262451,
-      "lon": 113.551957,
-      "azimuth": 253.8,
-      "altitude": 13.6,
+      "lat": 22.262329,
+      "lon": 113.551995,
+      "azimuth": 253.5,
+      "altitude": 13.3,
       "time": "16:55",
       "color": "#ff5200"
     },
     {
-      "lat": 22.263892,
-      "lon": 113.55155,
-      "azimuth": 256.9,
-      "altitude": 6.9,
+      "lat": 22.263767,
+      "lon": 113.551582,
+      "azimuth": 256.7,
+      "altitude": 6.6,
       "time": "17:25",
       "color": "#ff4c00"
     },
     {
-      "lat": 22.265244,
-      "lon": 113.55125,
-      "azimuth": 259.9,
-      "altitude": 0.1,
+      "lat": 22.265114,
+      "lon": 113.551276,
+      "azimuth": 259.6,
+      "altitude": -0.2,
       "time": "17:55",
       "color": "#ff4600"
     }
