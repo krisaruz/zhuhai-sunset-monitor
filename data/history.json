@@ -13,7 +13,7 @@
     "aod_raw": "0.460（小污）",
     "image_url": "",
     "sunset_azimuth": 259.2,
-    "fetch_time": "2026-10-18T02:17:53.470771+08:00",
+    "fetch_time": "2026-10-18T05:20:22.100340+08:00",
     "notified": false
   },
   {
@@ -39,15 +39,15 @@
     "event_time": "17:55",
     "event_type": "set_1",
     "model": "OpenMeteo",
-    "quality_value": 0.066,
-    "quality_label": "小烧",
-    "quality_raw": "0.066（小烧）",
+    "quality_value": 0.0,
+    "quality_label": "不烧",
+    "quality_raw": "0.000（不烧）",
     "aod_value": 0.17,
     "aod_label": "水晶",
     "aod_raw": "0.170（水晶）",
     "image_url": "",
     "sunset_azimuth": 259.6,
-    "fetch_time": "2026-10-18T02:17:52.309303+08:00",
+    "fetch_time": "2026-10-18T05:20:21.293414+08:00",
     "notified": false
   },
   {
