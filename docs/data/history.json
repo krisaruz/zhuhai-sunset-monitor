@@ -5,15 +5,15 @@
     "event_time": "17:54",
     "event_type": "set_2",
     "model": "OpenMeteo",
-    "quality_value": 0.0,
+    "quality_value": 0.005,
     "quality_label": "不烧",
-    "quality_raw": "0.000（不烧）",
+    "quality_raw": "0.005（不烧）",
     "aod_value": 0.31,
     "aod_label": "一般",
     "aod_raw": "0.310（一般）",
     "image_url": "",
     "sunset_azimuth": 258.8,
-    "fetch_time": "2026-10-19T00:27:57.540730+08:00",
+    "fetch_time": "2026-10-19T03:19:20.985320+08:00",
     "notified": false
   },
   {
@@ -47,7 +47,7 @@
     "aod_raw": "0.380（一般）",
     "image_url": "",
     "sunset_azimuth": 259.2,
-    "fetch_time": "2026-10-19T00:27:56.831022+08:00",
+    "fetch_time": "2026-10-19T03:19:19.837665+08:00",
     "notified": false
   },
   {
