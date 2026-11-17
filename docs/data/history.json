@@ -1,6 +1,23 @@
 [
   {
     "city": "珠海",
+    "event_date": "2026-11-18",
+    "event_time": "17:39",
+    "event_type": "set_2",
+    "model": "OpenMeteo",
+    "quality_value": 0.008,
+    "quality_label": "不烧",
+    "quality_raw": "0.008（不烧）",
+    "aod_value": 0.283,
+    "aod_label": "还不错",
+    "aod_raw": "0.283（还不错）",
+    "image_url": "",
+    "sunset_azimuth": 249.2,
+    "fetch_time": "2026-11-17T08:03:40.057722+08:00",
+    "notified": false
+  },
+  {
+    "city": "珠海",
     "event_date": "2026-11-17",
     "event_time": "17:39",
     "event_type": "set_2",
@@ -14,6 +31,23 @@
     "image_url": "",
     "sunset_azimuth": 249.5,
     "fetch_time": "2026-11-16T13:39:44.070770+08:00",
+    "notified": false
+  },
+  {
+    "city": "珠海",
+    "event_date": "2026-11-17",
+    "event_time": "17:39",
+    "event_type": "set_1",
+    "model": "OpenMeteo",
+    "quality_value": 0.045,
+    "quality_label": "微烧",
+    "quality_raw": "0.045（微烧）",
+    "aod_value": 0.223,
+    "aod_label": "还不错",
+    "aod_raw": "0.223（还不错）",
+    "image_url": "",
+    "sunset_azimuth": 249.5,
+    "fetch_time": "2026-11-17T08:03:39.388951+08:00",
     "notified": false
   },
   {
